@@ -37,6 +37,8 @@ jobs:
         project_id: ${{ env.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GCP_SA_EMAIL }}
+        create_credentials_file: true
+        export_environment_variables: true
 
     - name: Show gcp-auth step outputs
       run: |
@@ -52,7 +54,7 @@ jobs:
     - name: 'Use gcloud CLI'
       run: |
         echo "Testing access..."
-        gcloud auth list --filter=status:ACTIVE --format="value(account)"
+        gcloud auth list
         epoch_timestamp=$(date +%s)
         touch /tmp/date-$epoch_timestamp.txt
         ls /tmp/date-$epoch_timestamp.txt
