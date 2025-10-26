@@ -39,6 +39,7 @@ jobs:
         service_account: ${{ env.GCP_SA_EMAIL }}
         create_credentials_file: true
         export_environment_variables: true
+        token_format: "access_token"
 
     - name: Show gcp-auth step outputs
       run: |
