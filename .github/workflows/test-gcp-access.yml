@@ -36,6 +36,7 @@ jobs:
         project_id: ${{ env.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GCP_SA_EMAIL }}
+        audience: "https://iam.googleapis.com/${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}"
 
     - name: Show gcp-auth step outputs
       run: |
