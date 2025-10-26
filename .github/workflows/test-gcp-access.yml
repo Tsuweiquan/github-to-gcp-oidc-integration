@@ -11,8 +11,9 @@ on:
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
   GCP_WORKLOAD_IDENTITY_POOL: "twq-github-identity-pool"
-  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/twq-github-identity-pool/providers/GitHub"
+  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/twq-github-identity-pool/providers/github"
   GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}  
 
 jobs:
@@ -35,7 +36,6 @@ jobs:
         project_id: ${{ env.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GCP_SA_EMAIL }}
-        audience: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
     - name: Show gcp-auth step outputs
       run: |
