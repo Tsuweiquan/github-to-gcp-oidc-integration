@@ -15,6 +15,7 @@ env:
   GCP_WORKLOAD_IDENTITY_POOL: "twq-github-identity-pool"
   GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/twq-github-identity-pool/providers/github-provider"
   GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}  
+  GCP_TEST_BUCKET: "tsuweiquan-test-gcp-bucket"
 
 jobs:
   test-gcp-access:
@@ -52,5 +53,13 @@ jobs:
       run: |
         echo "Testing access..."
         gcloud auth list --filter=status:ACTIVE --format="value(account)"
-        gcloud projects describe ${{ env.GCP_PROJECT_ID }}
+        epoch_timestamp=$(date +%s)
+        touch /tmp/date-$epoch_timestamp.txt
+        ls /tmp/date-$epoch_timestamp.txt
+        echo "Uploading test file to GCS bucket..."
+        gcloud storage cp /tmp/date-$epoch_timestamp.txt gs://${{ env.GCP_TEST_BUCKET }}/date-$epoch_timestamp.txt
+        echo "Listing test file in GCS bucket..."
+        gsutil ls gs://tsuweiquan-test-gcp-bucket
+        echo "Deleting test file in GCS bucket..."
+        gsutil rm gs://tsuweiquan-test-gcp-bucket/date-$epoch_timestamp.txt
         gcloud iam service-accounts list
