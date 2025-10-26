@@ -1,6 +1,7 @@
 name: Test GCP Access
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       branch:
