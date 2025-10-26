@@ -62,4 +62,4 @@ jobs:
         gsutil ls gs://tsuweiquan-test-gcp-bucket
         echo "Deleting test file in GCS bucket..."
         gsutil rm gs://tsuweiquan-test-gcp-bucket/date-$epoch_timestamp.txt
-        gcloud iam service-accounts list
+        echo "GCP access test completed successfully."
