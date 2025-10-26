@@ -1,0 +1,65 @@
+name: Test GCP Access
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        default: 'master'
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+  GCP_WORKLOAD_IDENTITY_POOL: "twq-github-identity-pool"
+  GCP_WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/twq-github-identity-pool/providers/github-provider"
+  GCP_SA_EMAIL: ${{ secrets.GCP_SA_EMAIL }}  
+  GCP_TEST_BUCKET: "tsuweiquan-test-gcp-bucket"
+
+jobs:
+  test-gcp-access:
+    name: Test GCP Access
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Authenticate to GCP
+      id: gcp-auth
+      uses: 'google-github-actions/auth@v3'
+      with:
+        project_id: ${{ env.GCP_PROJECT_ID }}
+        workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ env.GCP_SA_EMAIL }}
+        create_credentials_file: true
+        export_environment_variables: true
+
+    - name: Show gcp-auth step outputs
+      run: |
+        echo "GCP_PROJECT_ID: ${{ steps.gcp-auth.outputs.project_id }}"
+        echo "GCP_ID_TOKEN: ${{ steps.gcp-auth.outputs.id_token }}"
+        echo "GCP_AUTH_TOKEN: ${{ steps.gcp-auth.outputs.auth_token }}"
+        
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v3.0.1'
+
+    - name: 'Use gcloud CLI'
+      run: |
+        echo "Testing access..."
+        gcloud auth list
+        epoch_timestamp=$(date +%s)
+        touch /tmp/date-$epoch_timestamp.txt
+        ls /tmp/date-$epoch_timestamp.txt
+        echo "Uploading test file to GCS bucket..."
+        gcloud storage cp /tmp/date-$epoch_timestamp.txt gs://${{ env.GCP_TEST_BUCKET }}/date-$epoch_timestamp.txt
+        echo "Listing test file in GCS bucket..."
+        gsutil ls gs://tsuweiquan-test-gcp-bucket
+        echo "Deleting test file in GCS bucket..."
+        gsutil rm gs://tsuweiquan-test-gcp-bucket/date-$epoch_timestamp.txt
+        echo "GCP access test completed successfully."
