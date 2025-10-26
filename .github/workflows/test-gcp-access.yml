@@ -36,7 +36,7 @@ jobs:
         project_id: ${{ env.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.GCP_SA_EMAIL }}
-        
+
     - name: Show gcp-auth step outputs
       run: |
         echo "GCP_PROJECT_ID: ${{ steps.gcp-auth.outputs.project_id }}"
@@ -50,5 +50,7 @@ jobs:
 
     - name: 'Use gcloud CLI'
       run: |
+        echo "Testing access..."
         gcloud auth list --filter=status:ACTIVE --format="value(account)"
+        gcloud projects describe ${{ env.GCP_PROJECT_ID }}
         gcloud iam service-accounts list
